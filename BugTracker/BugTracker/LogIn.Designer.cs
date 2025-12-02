@@ -85,7 +85,7 @@
             this.button1.TabIndex = 4;
             this.button1.Text = "LogIn";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.LogInClick);
             // 
             // label3
             // 
@@ -98,7 +98,7 @@
             this.label3.Size = new System.Drawing.Size(188, 16);
             this.label3.TabIndex = 5;
             this.label3.Text = "No account? Sign up here!";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
+            this.label3.Click += new System.EventHandler(this.OpenSignUpWindowClick);
             // 
             // pictureBox1
             // 

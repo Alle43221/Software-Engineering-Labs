@@ -13,6 +13,7 @@ namespace BugTracker.Domain
     [Table("User")]
     public class User : Entity<int>
     {
+
         [Key]
         public override int Id { get; set; }
         public string Name { get; set; }
@@ -43,5 +44,10 @@ namespace BugTracker.Domain
             Role = role;
         }
 
+        public User(string text1, string text2)
+        {
+            this.Username = text1;
+            this.Password = text2;
+        }
     }
 }

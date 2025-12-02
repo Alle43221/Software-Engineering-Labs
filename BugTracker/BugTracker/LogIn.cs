@@ -16,7 +16,7 @@ namespace BugTracker
         private static readonly ILog log = LogManager.GetLogger(typeof(Program));
         MyService service;
 
-        private void label3_Click(object sender, EventArgs e)
+        private void OpenSignUpWindowClick(object sender, EventArgs e)
         {
 
             this.Hide();
@@ -28,7 +28,7 @@ namespace BugTracker
            
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void LogInClick(object sender, EventArgs e)
         {
             log.Info("Trying to authenticate user");
             var result = service.AuthenticateUser(textBoxUsername.Text, textBoxPassword.Text);

@@ -15,12 +15,12 @@ namespace BugTracker
             this.service = service;
             service.AddObserver(this);
             InitializeComponent();
-            loadBugs(service.GetAllBugs());
+            LoadBugs(service.GetAllBugs());
         }
         private static readonly ILog log = LogManager.GetLogger(typeof(Program));
         MyService service;
 
-        private void loadBugs(IEnumerable<Bug> bugs)
+        private void LoadBugs(IEnumerable<Bug> bugs)
         {
             dataGridView1.DataSource = bugs;
             dataGridView1.Columns["Id"].Visible = false;
@@ -72,7 +72,7 @@ namespace BugTracker
             }
         }
         // Event handler when the selection changes in the DataGridView
-        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        private void SelectItem(object sender, EventArgs e)
         {
             if (dataGridView1.SelectedRows.Count > 0)
             {
@@ -102,7 +102,7 @@ namespace BugTracker
 
         void IBugObserver.OnBugListChanged(IEnumerable<Bug> bugs)
         {
-            loadBugs(bugs);
+            LoadBugs(bugs);
         }
     }
 }

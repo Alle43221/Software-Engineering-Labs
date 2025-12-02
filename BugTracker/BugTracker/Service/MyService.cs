@@ -42,101 +42,103 @@ namespace BugTracker.Service
                 return bugRepository.FindAll();
             }
 
-            // Authenticate a user and set the session.
-            public User AuthenticateUser(string username, string password)
+        // Authenticate a user and set the session.
+        public User AuthenticateUser(string username, string password)
+        {
+            User user1 = userRepository.FindByUsername(username);
+            if (user1 != null)
             {
-                foreach (var user in userRepository.FindAll())
+                if(user1.Password == password)
                 {
-                    if (string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase) &&
-                        user.Password == password)
-                    {
-                        // Store the user id and username in the session.
-                        UserSession.Login(user.Id.ToString(), user.Username);
-                        return user;
-                    }
+                    UserSession.Login(user1.Id.ToString(), user1.Username);
+                    return user1;
                 }
-                return null;
+            }
+            return null;
         }
 
             // Create a new user.
-            public User CreateNewUser(string name, string username, string password, Role role)
+        public User CreateNewUser(string name, string username, string password, Role role)
+        {
+            var user = new User
             {
-                var user = new User
-                {
-                    Name = name,
-                    Username = username,
-                    Password = password, // In production, store a hashed password instead.
-                    Role = role
-                };
+                Name = name,
+                Username = username,
+                Password = password, // In production, store a hashed password instead.
+                Role = role
+            };
 
-                var result = userRepository.Save(user);
-                if (result == null)
-                {
-                    throw new InvalidOperationException("User creation failed or user already exists.");
-                }
-
-                return user;
+            var result = userRepository.Save(user);
+            if (result == null)
+            {
+                throw new InvalidOperationException("User creation failed or user already exists.");
             }
 
-            // Create a new bug.
-            public Bug CreateNewBug(string title, string description)
+            return user;
+        }
+
+        // Create a new bug.
+        public Bug CreateNewBug(string title, string description)
+        {
+            // Ensure the user is logged in before creating a bug.
+            if (string.IsNullOrEmpty(UserSession.Username))
+                throw new UnauthorizedAccessException("User must be logged in to create a bug.");
+
+            var bug = new Bug
             {
-                // Ensure the user is logged in before creating a bug.
-                if (string.IsNullOrEmpty(UserSession.Username))
-                    throw new UnauthorizedAccessException("User must be logged in to create a bug.");
+                Title = title,
+                Description = description,
+            };
 
-                var bug = new Bug
-                {
-                    Title = title,
-                    Description = description,
-                    // CreatedAt and default Status (Open) are set in the Bug constructor.
-                };
-
-                var result = bugRepository.Save(bug);
-                if (result.Id == null)
-                {
-                    throw new InvalidOperationException("Bug creation failed or bug already exists.");
-                }
-
-            NotifyObservers();
-
-            return bug;
+            var result = bugRepository.Save(bug);
+            if (result.Id == null)
+            {
+                throw new InvalidOperationException("Bug creation failed or bug already exists.");
             }
+
+        NotifyObservers();
+
+        return bug;
+        }
 
             // Set a bug as closed.
-            public Bug CloseBug(int bugId)
+        public Bug CloseBug(int bugId)
+        {
+            // Ensure the user is logged in before closing a bug.
+            if (string.IsNullOrEmpty(UserSession.Username))
+                throw new UnauthorizedAccessException("User must be logged in to close a bug.");
+
+            var bug = bugRepository.FindOne(bugId);
+            if (bug == null)
             {
-                // Ensure the user is logged in before closing a bug.
-                if (string.IsNullOrEmpty(UserSession.Username))
-                    throw new UnauthorizedAccessException("User must be logged in to close a bug.");
-
-                var bug = bugRepository.FindOne(bugId);
-                if (bug == null)
-                {
-                    throw new ArgumentException("Bug not found.");
-                }
-
-                bug.Status = BugStatus.Closed;
-                var updateResult = bugRepository.Update(bug);
-                if (updateResult.Status!=BugStatus.Closed)
-                {
-                    throw new InvalidOperationException("Failed to update the bug.");
-                }
-                // Notify observers about the bug list change.
-                NotifyObservers();
-                // Return the updated bug.
-
-            return bug;
+                throw new ArgumentException("Bug not found.");
             }
 
-            public User? GetUserByUsername(string username)
+            bug.Status = BugStatus.Closed;
+            var updateResult = bugRepository.Update(bug);
+            if (updateResult.Status!=BugStatus.Closed)
             {
-                return userRepository.FindByUsername(username);
+                throw new InvalidOperationException("Failed to update the bug.");
             }
+            // Notify observers about the bug list change.
+            NotifyObservers();
+            // Return the updated bug.
+
+        return bug;
+        }
+
+        public User GetUserByUsername(string username)
+        {
+            User user = userRepository.FindByUsername(username);
+            if(user == null)
+            {
+                return null;
+            }
+            return user;
+        }
 
         public void LogOut()
         {
-            // Clear user session (assuming UserSession has a Logout method to clear the session)
             UserSession.Logout();
         }
     }
