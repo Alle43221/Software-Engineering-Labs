@@ -105,7 +105,7 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(624, 394);
             this.dataGridView1.TabIndex = 6;
-            this.dataGridView1.SelectionChanged += dataGridView1_SelectionChanged;
+            this.dataGridView1.SelectionChanged += SelectItem;
             // 
             // button2
             // 
